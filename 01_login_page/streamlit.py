@@ -1,24 +1,20 @@
 import streamlit as st
 
-# Define the session state class
-class SessionState:
-    def __init__(self, **kwargs):
-        self.__dict__.update(**kwargs)
 
-# Create a session state object
-session_state = SessionState(page="login")
+class Login:
 
-def dashboard_page():
-    st.write("""
-    # Dashboard
-    Welcome to the dashboard!
-    """)
-
-def login_page():
-    st.write("""
-    # Login
-    Please enter your credentials
-    """)
+    @staticmethod
+    def dashboard_page():
+        st.write("""
+        # Dashboard
+        Welcome to the dashboard!
+        """)
+    @staticmethod
+    def login_page():
+        st.write("""
+        # Login
+        Please enter your credentials
+        """)
 
     # Add login form inputs
     username = st.text_input("Username")
