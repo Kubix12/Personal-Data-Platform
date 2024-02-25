@@ -1,8 +1,5 @@
 import streamlit as st
-import sys
-
-sys.path.append(r'C:\Users\banas\Desktop\ProjectsPython\Personal-Data-Platform\02_database')
-from db_users import Database
+from database.db_users import Database
 
 
 def authenticate(username, password):

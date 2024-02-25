@@ -1,5 +1,5 @@
 import streamlit as st
-from
+from database.db_users import Database
 
 
 def sign_up():
@@ -9,7 +9,7 @@ def sign_up():
     password = st.text_input("Password", type="password")
 
     if st.button("Sign up"):
-
+        Database.sign_up(username, password)
         st.success("Sign up successfully!")
 
 
