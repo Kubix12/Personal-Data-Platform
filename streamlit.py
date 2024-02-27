@@ -20,11 +20,10 @@ class Database:
         cur.execute(query, (self.table_name,))
         result_tables = cur.fetchone()[0]
         if result_tables:
-            print('table exists')
+            return True
         else:
             cur.execute(f"CREATE TABLE IF NOT EXISTS {self.table_name}(ID SERIAL PRIMARY KEY, LOGIN TEXT, PASSWORD "
                         f"TEXT);")
-            print('create table')
             conn.commit()
             conn.close()
 
@@ -32,12 +31,19 @@ class Database:
         conn = psycopg2.connect(dbname=self.database_name, user=self.database_user, password=self.database_password,
                                 host=self.database_host, port=self.database_port)
         cur = conn.cursor()
-
-        query = f'INSERT INTO {self.table_name}(login, password) VALUES (%s, %s);'
-        cur.execute(query, (login, user_password))
-        print("Data inserted successfully")
-        conn.commit()
-        conn.close()
+        query = f'SELECT COUNT(*) FROM {self.table_name} WHERE login= %s;'
+        cur.execute(query, (login,))
+        result = cur.fetchone()
+        count = result[0]
+        if count == 1:
+            return False
+        else:
+            query = f'INSERT INTO {self.table_name}(login, password) VALUES (%s, %s);'
+            cur.execute(query, (login, user_password))
+            print("Data inserted successfully")
+            conn.commit()
+            conn.close()
+            return True
 
     def login_data(self, login, user_password):
         conn = psycopg2.connect(dbname=self.database_name, user=self.database_user, password=self.database_password,
@@ -76,7 +82,7 @@ def connection():
 def main():
     st.title("Welcome in Personal Data Platform!")
     page = st.radio("Choose one", ["Login", "Sign Up"])
-
+    connection().create_table()
     if page == "Sign Up":
         sign_up_page()
     elif page == "Login":
@@ -84,13 +90,7 @@ def main():
             dashboard()
         else:
             st.write("Please login first to access the dashboard")
-
     connection().create_table()
-
-
-def dashboard():
-    st.title("Dashboard")
-    st.write("Welcome to the dashboard!")
 
 
 def authenticate(username, password):
@@ -122,8 +122,46 @@ def sign_up_page():
     password = st.text_input("Password", type="password")
 
     if st.button("Sign Up"):
-        connection().sign_up(username, password)
-        st.success("Sign up successful! Please log in.")
+        s = connection().sign_up(username, password)
+        if s:
+            st.success("Sign up successful! Please log in.")
+        else:
+            st.success("Username already exist. Please try another username")
+
+
+def dashboard():
+    st.title("Dashboard")
+    left_column, right_column = st.columns(2)
+    with left_column:
+        if st.button("To-Do list"):
+            todo_list_page()
+    with right_column:
+        if st.button("Calendar"):
+            calendar()
+
+
+
+def todo_list_page():
+    st.title("To-Do List")
+
+    # Get current list from session state
+    if "todo_list" not in st.session_state:
+        st.session_state.todo_list = []
+
+    # Add task to to-do list
+    new_task = st.text_input("Add a new task")
+    if st.button("Add Task") and new_task:
+        st.session_state.todo_list.append(new_task)
+
+    # Display to-do list
+    st.write("### Your To-Do List:")
+    for i, task in enumerate(st.session_state.todo_list, start=1):
+        st.write(f"{i}. {task}")
+
+
+def calendar():
+    st.title("Another Page")
+    st.write("Welcome to another page!")
 
 
 if __name__ == "__main__":
