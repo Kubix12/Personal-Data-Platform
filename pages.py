@@ -1,8 +1,12 @@
 import streamlit as st
 import database_connector
+import job_database
 from database import Database
 from job_database import JobDatabase
 import pandas as pd
+from streamlit_calendar import calendar
+import calendar_page
+import datetime
 
 
 def main():
@@ -54,23 +58,57 @@ def job_application():
     if st.button("Save"):
         database_connector.connection_job().save_data(job_title, company_name, notes)
         st.success("Data saved successfully!")
-    sorted_data = database_connector.connection_job().get_data_sorted_by_date()
-    st.write(pd.DataFrame(sorted_data, columns=["Date", "Job Title", "Company Name", "Notes"]))
+
+    st.write("Current application:")
+
+    # -- GET DATA SORTED BY DATE --
+    if st.button('Get data sorted by date'):
+        sorted_data = database_connector.connection_job().get_data_sorted_by_date()
+        st.write(pd.DataFrame(sorted_data, columns=["Date", "Job Title", "Company Name", "Notes"]))
+
+    # -- GET DATA BY DATE
+    if st.button('Get data by date'):
+        d = st.text_input('Enter date:')
+        if st.button('Get data'):
+            data = database_connector.connection_job().get_data_by_date(d_str)
+            st.write(pd.DataFrame(data))
+        else:
+            st.write('No data found')
 
 
-def calendar():
-    st.title('Calendar')
+def calendar_dashboard():
+    st.title('Calendar App')
+    calendar_1 = calendar(events=calendar_page.calendar_events, options=calendar_page.calendar_options,
+                          custom_css=calendar_page.custom_css)
+    print(calendar_1)
+    st.write(calendar_1)
 
 
 def to_do_list():
-    st.title('To do list')
+    todo_list = []
+    st.title('To do list App')
+    item = st.text_input('Enter to-do item')
+    if st.button('Add'):
+        if item:
+            todo_list.append(item)
+            st.success('Successfully added')
+        else:
+            st.warning("Please enter to-do item")
+
+    if todo_list:
+        st.write("To-Do List:")
+        for i, val in enumerate(todo_list, start=1):
+            st.write(i, val)
+
+    else:
+        st.write("Your current list is empty")
 
 
 def dashboard():
-    st.title("Dashboard")
-    page = st.selectbox('Choose one', ['Job application', 'Calendar', 'To do list'])
-    if st.button("Logout"):
+    st.title("Personal Dashboard")
+    if st.button("Logout", type="primary"):
         st.session_state.is_authenticated = False
+    page = st.selectbox('Choose one', ['Job application', 'Calendar', 'To do list'])
     if page == 'Job application':
         job_application()
     elif page == 'Calendar':
