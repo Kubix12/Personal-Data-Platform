@@ -1,5 +1,6 @@
 from database import Database
 from job_database import JobDatabase
+from task_database import TaskDatabase
 
 
 # -- connector with database.py --
@@ -34,3 +35,15 @@ def connection_job():
 
     db_job = JobDatabase(name, user, password, host, port, table)
     return db_job
+
+
+def connection_tasks():
+    name = 'demo'
+    user = 'postgres'
+    password = '123'
+    host = 'localhost'
+    port = '5432'
+    table = 'tasks'
+
+    db_tasks = TaskDatabase(name, user, password, host, port, table)
+    return db_tasks
