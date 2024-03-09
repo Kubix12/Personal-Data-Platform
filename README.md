@@ -1,8 +1,7 @@
 # Personal-Data-Platform
+Create your own space in Personal Data Platform.
 
-## Architecture
-
-![Screenshot](https://github.com/Kubix12/Persona-Data-Platform/blob/main/assets/dashboard.png)
+![Screenshot](assets/dashboard.png)
 
 ## Description
 
