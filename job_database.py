@@ -35,8 +35,8 @@ class JobDatabase:
         conn = psycopg2.connect(dbname=self.database_name, user=self.database_user, password=self.database_password,
                                 host=self.database_host, port=self.database_port)
         cur = conn.cursor()
-        query = f"SELECT * FROM {self.table_name} WHERE date = {date}"
-        cur.execute(query)
+        query = f"SELECT * FROM {self.table_name} WHERE date = %s"
+        cur.execute(query, (date,))
         data = cur.fetchall()
         conn.commit()
         conn.close()
