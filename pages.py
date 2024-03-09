@@ -59,7 +59,8 @@ def job_application():
         database_connector.connection_job().save_data(job_title, company_name, notes)
         st.success("Data saved successfully!")
 
-    st.write("Current application:")
+    st.title("Current application:")
+    st.write('Get data sorted by date:')
 
     # -- GET DATA SORTED BY DATE --
     if st.button('Get data sorted by date'):
@@ -67,13 +68,19 @@ def job_application():
         st.write(pd.DataFrame(sorted_data, columns=["Date", "Job Title", "Company Name", "Notes"]))
 
     # -- GET DATA BY DATE
+    st.write('Get data by date:')
+    date_input = str(st.text_input('Enter date (YYYY-MM-DD):'))
     if st.button('Get data by date'):
-        d = st.text_input('Enter date:')
-        if st.button('Get data'):
-            data = database_connector.connection_job().get_data_by_date(d_str)
-            st.write(pd.DataFrame(data))
+        if date_input:
+            data = database_connector.connection_job().get_data_by_date(date_input)
+            if data:
+                st.write(pd.DataFrame(data))
+            else:
+                st.write('No data found for data:', date_input)
         else:
-            st.write('No data found')
+            st.write('Waiting for "Get data" button to be clicked')
+    else:
+        st.write('Please enter a valid date')
 
 
 def calendar_dashboard():
