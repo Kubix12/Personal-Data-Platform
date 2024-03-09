@@ -3,6 +3,7 @@ import database_connector
 import job_database
 from database import Database
 from job_database import JobDatabase
+from task_database import TaskDatabase
 import pandas as pd
 from streamlit_calendar import calendar
 import calendar_page
@@ -92,23 +93,37 @@ def calendar_dashboard():
 
 
 def to_do_list():
-    todo_list = []
     st.title('To do list App')
-    item = st.text_input('Enter to-do item')
-    if st.button('Add'):
-        if item:
-            todo_list.append(item)
-            st.success('Successfully added')
+    st.write('Add a new task')
+    task_description = st.text_input('Enter task description')
+    date = st.text_input('Enter due date')
+    status = st.text_input('Enter status')
+    if st.button('Add Task'):
+        if task_description and date and status:
+            database_connector.connection_tasks().save_data(task_description.upper(), date, status)
+            st.success('Added task:' + task_description)
         else:
-            st.warning("Please enter to-do item")
-
-    if todo_list:
-        st.write("To-Do List:")
-        for i, val in enumerate(todo_list, start=1):
-            st.write(i, val)
-
+            st.warning("Please enter task")
     else:
-        st.write("Your current list is empty")
+        st.write('Invalid: Please enter the task')
+
+    st.subheader('Current To-Do List:')
+    get_data = database_connector.connection_tasks().get_data()
+    for task in get_data:
+        task_id = task[0]
+        task_description = task[1]
+        due_date = task[2]
+        status = task[3]
+
+        # Display a checkbox for each task
+        task_completed = st.checkbox(f'{task_description} Due: {due_date} - {status}', value=status == "Completed",
+                                     key=task_id)
+
+        # Update the status of the task based on the checkbox value
+        if task_completed:
+            database_connector.connection_tasks().update_status(task_id, "Completed")
+        else:
+            database_connector.connection_tasks().update_status(task_id, "Pending")
 
 
 def dashboard():
